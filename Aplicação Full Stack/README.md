@@ -11,7 +11,4 @@ Este projeto é uma aplicação web full stack containerizada com Docker, compos
 - **Banco de Dados**: PostgreSQL
 - **Orquestração**: Docker + Docker Compose
 
----
-
-## 📁 Estrutura do Projeto
 

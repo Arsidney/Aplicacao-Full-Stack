@@ -1,0 +1,48 @@
+services:
+  postgres_db:
+    image: postgres:14
+    restart: always 
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: myappdb
+      POSTGRES_USER: myappuser
+      POSTGRES_PASSWORD: strongpassword
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network         # <--- Adicionado aqui
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myappuser -d myappdb"] 
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  backend:
+    build: ./backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgres://myappuser:strongpassword@postgres_db:5432/myappdb
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
+volumes:
+  pgdata:
+
+networks:
+  app-network:
+    driver: bridge
